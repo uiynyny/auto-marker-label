@@ -15,20 +15,20 @@ import automarkerlabel as aml
 
 num_epochs = 10 # Number of epochs to train for
 # Path for save location of trained model
-fld = os.path.join('.','data')
+fld = os.path.join('.','training_data')
 # Path to folder containing labelled .c3d files to add to training set
-datapath = os.path.join('.','data','transfer_learning_data')
+datapath = os.path.join(fld,'transfer_learning_data')
 # Path to a .ckpt file of a previously trained neural network to use as base for transfer learning
-modelpath = os.path.join('.','data','model_2020-10-27.ckpt')
+modelpath = os.path.join(fld,'model_2023-09-01.ckpt')
 # Path to training values from previously trained algorithm. 
 # Should match the model used in modelpath.
-trainvalpath = os.path.join('.','data','trainingvals_2020-10-27.pickle')
+trainvalpath = os.path.join(fld,'trainingvals_2023-09-01.pickle')
 # Path to .xml file of OpenSim marker set
-markersetpath = os.path.join('.','data','MarkerSet.xml')
+markersetpath = os.path.join(fld,'MarkerSet_ZX_new.xml')
 windowSize = 120 # size of windows used to segment data for algorithm
 # Markers to use to align person such that they face +x. Suggest acromions or pelvis markers.
-alignMkR = 'RAC'
-alignMkL = 'LAC'
+alignMkR = 'RSHO'
+alignMkL = 'LSHO'
 
 # Path to .ckpt file where training progress will be saved after each epoch. Set to None 
 # to only save model once training is complete

@@ -597,6 +597,7 @@ def import_raw_c3d(file,rotang):
     rawpts = c3ddat['data']['points'][0:3,:,:].transpose((2,1,0)) # Get points from c3d file
     fs = c3ddat['parameters']['POINT']['RATE']['value'] # sampling frequency
     rawlabels = c3ddat['parameters']['POINT']['LABELS']['value']
+    otherpoints = c3ddat['parameters']['POINT']
     
     # # Try to find and fix places where the markers swap indices
     # thresh = 20
@@ -631,7 +632,9 @@ def import_raw_c3d(file,rotang):
     # next closest marker. If so, split it into a new trajectory.
     pts = np.empty((rawpts.shape[0],0,3))
     labels = []
-    for m in range(rawpts.shape[1]):    
+    for m in range(rawpts.shape[1]):
+        if not (isrealmarker(rawlabels,rawlabels[m]) and ismarker(otherpoints,rawlabels[m])):
+            continue
         # key frames where the marker appears or disappears  
         kf = np.where(np.isnan(rawpts[1:,m,0]) != np.isnan(rawpts[0:-1,m,0]))[0]
         if ~np.isnan(rawpts[0,m,0]):
@@ -676,6 +679,35 @@ def import_raw_c3d(file,rotang):
     return pts, fs, labels
 
 
+def isrealmarker(rawlabels, label) :
+    """check if a marker is a real marker by replacing the last character with 'L' 'O' 'A' 'P'
+
+    Args:
+        rawlabels (list of str): all labels in the c3d file
+        label (str): current label being investigated
+
+    Returns:
+        bool: True if the marker is a real marker
+    """
+    
+    if label.endswith('L') or label.endswith('O') or label.endswith('A') or label.endswith('P'):
+        return not (label[:-1]+'L' in rawlabels and label[:-1]+'O' in rawlabels and label[:-1]+'A' in rawlabels and label[:-1]+'P' in rawlabels)
+    return True
+
+def ismarker(points, label):
+    """check if label is a marker
+
+    Args:
+        points (dict of listof str): dictionary of all points in the c3d file 
+        label (str): current label name
+
+    Returns:
+        bool : if label is a marker
+    """
+    for key in points:
+        if key != 'LABELS' and 'value' in points[key] and label in points[key]['value']:
+            return False
+    return True
 # --------------------------------------------------------------------------- #
 # ------------------------- NEURAL NET FUNCTIONS ---------------------------- #
 # --------------------------------------------------------------------------- #
